@@ -8,8 +8,8 @@ import { HttpHeadersContext } from "../context/HttpHeadersProvider";
 
 function Login() {
 
-	const { auth, setAuth } = useContext(AuthContext);
-	const { headers, setHeaders } = useContext(HttpHeadersContext);
+	const { setAuth } = useContext(AuthContext);
+	const { setHeaders } = useContext(HttpHeadersContext);
 
 	const navigate = useNavigate();
 
@@ -25,16 +25,15 @@ function Login() {
 	}
 
 	const login = async () => {
-
 		const req = {
 			email: id,
-			password: pwd
-		}
+			password: pwd,
+		};
 
 		await axios.post("http://localhost:8989/user/login", req)
-		.then((resp) => {
-			console.log("[Login.js] login() success :D");
-			console.log(resp.data);
+			.then((resp) => {
+				console.log("[Login.js] login() success :D");
+				console.log(resp.data);
 
 				alert(resp.data.email + "님, 성공적으로 로그인 되었습니다 🔐");
 
@@ -43,43 +42,77 @@ function Login() {
 				localStorage.setItem("id", resp.data.email);
 
 				setAuth(resp.data.email); // 사용자 인증 정보(아이디 저장)
-				setHeaders({"Authorization": `Bearer ${resp.data.toekn}`}); // 헤더 Authorization 필드 저장
+				setHeaders({ Authorization: `Bearer ${resp.data.token}` }); // 헤더 Authorization 필드 저장
 
 				navigate("/bbslist");
-			
+			})
+			.catch((err) => {
+				console.log("[Login.js] login() error :<");
+				console.log(err);
 
-		}).catch((err) => {
-			console.log("[Login.js] login() error :<");
-			console.log(err);
-
-			alert("⚠️ " + err.response.data);
-		});
-	}
+				alert("⚠️ " + err.response.data);
+			});
+	};
 
 	return (
-		<div>
-			<table className="table">
-				<tbody>
-					<tr>
-						<th className="col-3">아이디</th>
-						<td>
-							<input type="text" value={id} onChange={changeId} size="50px" />
-						</td>
-					</tr>
+		<div className="container mt-5">
+			<div className="card shadow border-0" style={{ backgroundColor: "#f8f9fa" }}>
+				<div className="card-header text-center" style={{ backgroundColor: "#6c757d", color: "white" }}>
+					<h3>로그인</h3>
+				</div>
+				<div className="card-body">
+					<form>
+						<div className="mb-4">
+							<label htmlFor="email" className="form-label" style={{ color: "#495057" }}>아이디</label>
+							<input
+								type="text"
+								id="email"
+								className="form-control"
+								placeholder="아이디를 입력하세요"
+								value={id}
+								onChange={changeId}
+								style={{
+									backgroundColor: "#e9ecef",
+									border: "1px solid #ced4da",
+									color: "#495057",
+								}}
+							/>
+						</div>
 
-					<tr>
-						<th>비밀번호</th>
-						<td>
-							<input type="password" value={pwd} onChange={changePwd} size="50px" />
-						</td>
-					</tr>
-				</tbody>
-			</table><br />
+						<div className="mb-4">
+							<label htmlFor="password" className="form-label" style={{ color: "#495057" }}>비밀번호</label>
+							<input
+								type="password"
+								id="password"
+								className="form-control"
+								placeholder="비밀번호를 입력하세요"
+								value={pwd}
+								onChange={changePwd}
+								style={{
+									backgroundColor: "#e9ecef",
+									border: "1px solid #ced4da",
+									color: "#495057",
+								}}
+							/>
+						</div>
 
-			<div className="my-1 d-flex justify-content-center">
-				<button className="btn btn-outline-secondary" onClick={login}><i className="fas fa-sign-in-alt"></i> 로그인</button>
+						<div className="d-flex justify-content-center">
+							<button
+								type="button"
+								className="btn"
+								style={{
+									backgroundColor: "#6c757d",
+									color: "white",
+									width: "100%",
+								}}
+								onClick={login}
+							>
+								<i className="fas fa-sign-in-alt"></i> 로그인
+							</button>
+						</div>
+					</form>
+				</div>
 			</div>
-
 		</div>
 	);
 }
